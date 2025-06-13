@@ -10,6 +10,7 @@
 // #include <Adafruit_MPU6050.h>
 // #include <MadgwickAHRS.h>
 #include "arduino_secrets.h"
+#include "gamepageHTML.h"
 
 // #define SCREEN_WIDTH 128  // OLED display width, in pixels
 // #define SCREEN_HEIGHT 64  // OLED display height, in pixels
@@ -33,6 +34,7 @@ char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
 
 WiFiServer server(80);
+WiFiServer serverWS(81);
 
 const int ledPin = 13;
 const int buttonA = 5;
@@ -105,8 +107,10 @@ void setup() {
     Serial.println("Connecting...");
   }
 
-  Serial.println("Connected!");
   server.begin();
+  Serial.println("Connected!");
+  Serial.print("LocalIP : ");
+  Serial.println(WiFi.localIP());
   // display.clearDisplay();
   // display.setTextSize(1);       // Set text size
   // display.setTextColor(WHITE);  // Set text color
@@ -115,16 +119,51 @@ void setup() {
   // display.print("Initialized!");
 }
 
+bool loaded = false;
+
 void loop() {
   WiFiClient client = server.available();
+  WiFiClient clientWS = serverWS.available();
+  // Serial.print("LocalIP : ");
+  // Serial.println(WiFi.localIP());
+  // Serial.println(client);
   if (client) {
     String request = "";
-    while (client.connected() && !client.available()) delay(1);
-    while (client.available()) {
-      char c = client.read();
-      request += c;
-      if (request.endsWith("\r\n\r\n")) break;
+    String currentLine = "";
+    while (client.connected() && !client.available()) {
+      delay(1);
+      Serial.println("not available");
+    };
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+        request += c;
+        // Serial.println("loadingnow...");
+        Serial.print(c);
+        if (c == '\n') {
+          if (currentLine.length() == 0) {
+            client.println("HTTP/1.1 101 OK");
+            client.print("Content-type:text/html\n\n");
+            client.print(HTML_DATA_A);
+            client.print(WiFi.localIP());
+            client.print(HTML_DATA_B);
+            break;
+          }
+          else {
+            currentLine = "";
+          }
+
+        } else if (c != '\r') currentLine += c;
+        if (request.endsWith("\r\n\r\n")) {
+          Serial.println("");
+          
+          break;
+        }
+
+      }
     }
+
+
 
     int keyStart = request.indexOf("Sec-WebSocket-Key: ");
     if (keyStart < 0) return;
@@ -146,6 +185,8 @@ void loop() {
     client.print("Upgrade: websocket\r\n");
     client.print("Connection: Upgrade\r\n");
     client.print("Sec-WebSocket-Accept: " + acceptKey + "\r\n\r\n");
+    
+    // client.stop();  // フレーム処理は別途
 
     Serial.println("Handshake complete.");
 
@@ -255,6 +296,7 @@ void loop() {
     
 
     client.stop();  // フレーム処理は別途
+    loaded = false;
     Serial.println("Client disconnected.");
   }
 }
