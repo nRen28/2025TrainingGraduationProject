@@ -37,8 +37,13 @@ bombImage.src = 'images/bakuhatsu3.png';
 
 const titleBGM = 'audio/bgm/nandainoitteme.wav';
 const gameBGM = 'audio/bgm/saranarukunann.wav';
+const countSE = 'audio/se/count.wav';
+const startSE = 'audio/se/start.wav';
+const bombSE = 'audio/se/honoobakuhatsu.wav';
+const gameoverJingle = 'audio/se/gameover.wav';
 
 const bgmPlayer = document.createElement('audio');
+const sePlayer = document.createElement('audio');
 
 var playerHitBox = [0, 0, 50, 50];
 var stoneHitBox = [
@@ -77,6 +82,12 @@ var isStop = false;
 //     bgmPlayer.play();
 // };
 
+window.onload = function () {
+    sePlayer.volume = 0.25;
+    bgmPlayer.volume = 0.25;
+
+};
+
 function connectWebSocket() {
     statusSpan.textContent = '接続中...';
     // addLog('接続中...');
@@ -85,13 +96,16 @@ function connectWebSocket() {
 
     ws.onopen = function () {
         statusSpan.textContent = '接続済み';
+        bgmPlayer.pause();
         playingGame = true;
+        sePlayer.src = countSE;
+        sePlayer.play();
         // addLog('接続成功');
         updateButtons();
     };
 
     ws.onmessage = function (event) {
-        console.log('データタイプ:', typeof event.data);
+        // console.log('データタイプ:', typeof event.data);
         try {
             const sensorData = JSON.parse(event.data);
             bd = sensorData['button'];
@@ -226,6 +240,19 @@ function drawGame() {
         if (!startGame && !isStop) {
             if (timer % 60 == 0) {
                 sec++;
+                if (sec < 3) {
+                    sePlayer.src = countSE;
+                    sePlayer.play();
+                }
+                else if (sec == 3) {
+                    sePlayer.src = startSE;
+                    sePlayer.play();
+                }
+                else if (sec == 4) {
+                    bgmPlayer.src = gameBGM;
+                    bgmPlayer.loop
+                    bgmPlayer.play();
+                }
             }
             switch(sec) {
                 case 0:
@@ -356,21 +383,46 @@ function drawGame() {
                     isStop = true;
                     timer = 1;
                     sec = 0;
+                    sePlayer.src = bombSE;
+                    sePlayer.play();
+                    bgmPlayer.pause();
                 }
             }
 
         }
         else {
-            ctx.fillStyle = 'black';
-            ctx.font = '70px sans-serif';
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 6;
-            ctx.textAlign = 'center';
-            ctx.strokeText('GAME OVER', canvas.width/2, canvas.height/2);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 3;
-            ctx.strokeText('GAME OVER', canvas.width/2, canvas.height/2);
-            ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2);
+            if (timer % 60 == 0) {
+                sec++;
+                if (sec == 2) {
+                    bgmPlayer.src = gameoverJingle;
+                    bgmPlayer.loop = false;
+                    bgmPlayer.play();
+                }
+            }
+            // console.log(sec);
+            if (sec >= 2) {
+                ctx.fillStyle = 'black';
+                ctx.font = '70px sans-serif';
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 6;
+                ctx.textAlign = 'center';
+                ctx.strokeText('GAME OVER', canvas.width/2, canvas.height/2);
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 3;
+                ctx.strokeText('GAME OVER', canvas.width/2, canvas.height/2);
+                ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2);
+            
+                ctx.strokeStyle = 'white';
+                ctx.fillStyle = 'red';
+                ctx.font = '35px sans-serif';
+                ctx.strokeText('Bボタン', canvas.width/2 - 85, canvas.height/2 + 50);
+                ctx.fillText('Bボタン', canvas.width/2 - 85, canvas.height/2 + 50);
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = 'white';
+                ctx.strokeText('でリトライ', canvas.width/2 + 70, canvas.height/2 + 50);
+                ctx.fillText('でリトライ', canvas.width/2 + 70, canvas.height/2 + 50);
+            }
+            if (bd == 2) gameReset();
         }
         
         var playerPos = playerX - (carsizeX / 2) + (canvas.width / 2);
@@ -420,10 +472,39 @@ canvas.addEventListener("click", e => {
     if (bgmPlayer.paused && !playingGame) {
         if (!playingGame) {
             bgmPlayer.loop = true;
-            bgmPlayer.volume = 0.2;
             bgmPlayer.src = titleBGM;
             bgmPlayer.play();
         }
 
     }
 });
+
+function gameReset() {
+    const mag = 0.35;
+    const grasssizeY = 98 * mag * 0.8;
+    const stonesizeX = 400 * mag * 0.5;
+    const stonesizeY = 362 * mag * 0.5;
+    score = 0;
+    timer = 0;
+    sec = 0;
+    playerX = 0;
+    level = 1;
+    for (let i = 0; i < 4; i++) {
+        stonePos[i][1] = -stonesizeY - (Math.floor(Math.random() * canvas.height) - 10);
+        stonePos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
+        stoneHitBox[i][0] = stonePos[i][0] + 10;
+        stoneHitBox[i][1] = stonePos[i][1] + 20;
+        stoneHitBox[i][2] = stonesizeX-20;
+        stoneHitBox[i][3] = stonesizeY-30;
+    }
+    for (let i = 0; i < 5; i++) {
+        grassPos[i][1] = -grasssizeY + (Math.floor(Math.random() * canvas.height));
+        grassPos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
+    }
+    isStop = false;
+    startGame = false;
+    sePlayer.src = countSE;
+    bgmPlayer.pause();
+    bgmPlayer.loop = true;
+    sePlayer.play();
+}
