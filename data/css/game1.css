@@ -1,0 +1,33 @@
+body {
+    background-color: aliceblue;
+}
+
+.view {
+    border: 2px solid black;
+}
+
+.gameview {
+    display: flex;
+    justify-content: center;
+}
+
+.header {
+    height: 60px;
+    background-color: lightcyan;
+    box-sizing: border-box;
+    border: 5px solid darkgreen;
+    font-size: 30px;
+    font-family: sans-serif;
+    font-weight: 1000;
+    text-align: center;
+}
+
+.score {
+    background-color: white;
+    height: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top: 5px double;
+    border-right: 5px double;
+    border-bottom: 5px double;
+}

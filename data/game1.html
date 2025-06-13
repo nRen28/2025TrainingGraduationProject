@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ドライブゲーム</title>
+        <link rel="stylesheet" href="css/game1.css">
+    </head>
+    <body>
+        <!--div hidden>Hello World!</div-->
+        <div class="header">ドライブゲーム</div>
+        <br>
+        <div id="gameview" class="gameview">
+            <canvas id="view" class="view" width="400" height="600"></canvas>
+            <div class="score">
+                <p id="score" style="font-family: 'Arial black';">Score : 00000</p>
+                <p id="level" style="font-family: 'Arial black';">Level : 1</p>
+                <p id="pxd" hidden>xd : 0</p>
+                
+                <div id="connectview" class="connectview">
+                    <br>
+                    <p>接続先: <span id="serverUrl">ws://192.168.10.110:80</span></p>
+                    <p>状態: <span id="status">切断中</span></p>
+                    
+                    <button id="connectBtn">接続開始</button>
+                </div>
+            </div>
+        </div>
+
+        
+
+        
+        
+        <script src="js/game1.js"></script>
+    </body>
+</html>
