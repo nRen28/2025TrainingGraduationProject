@@ -4,8 +4,8 @@
 
 Arduino UNO R4 Wifiを用いたwebsocket通信とクライアントサーバーの構築及びそれによるデータ通信でプレイ可能なブラウザゲーム<br>
 通信でコントローラーの操作情報を送り、赤い車を操作して岩を躱しつづけた時間でスコアが決定する<br>
-HTMLはGoogle Chromeでのみ動作確認済<br><br>
-実際にR4Wifiの中で使われているソースファイルは全て```gameproject3```フォルダ内に入っており、HTML、CSS、JSの内容を分かりやすくそれぞれのファイルにまとめたものが```data```フォルダに入っている
+Google Chromeでのみ動作確認済<br><br>
+実際にR4WiFiの中で使われているソースファイルは全て```gameproject3```フォルダ内に入っており、HTML、CSS、JSの内容を分かりやすくそれぞれのファイルにまとめたものが```data```フォルダに入っている
 
 <br>
 <br>
@@ -13,6 +13,20 @@ HTMLはGoogle Chromeでのみ動作確認済<br><br>
 ![GitHub](./ReadmeImages/RepositoryQR.png)<br>
 **プロジェクトのGitHubリポジトリのQRコード**<br>
 https://github.com/fanofJOTARO/2025TrainingGraduationProject
+
+## 実際に動作させる方法
+
+### 事前準備
+
+1. 本資料のブレッドボード画像と回路図接続の画像を参考に回路を組む
+2. リポジトリから```gameproject3```フォルダをダウンロード（リポジトリごとでもOK）
+
+### セットアップ方法
+
+1. フォルダ内の```gameproject3.ino```をArduino IDEで開く
+2. ```arduino_secrets.h```の```SECRET_SSID```と```SECRET_PASS```を自が使用しているWi-Fiの2.5GHzのものに書き換える
+3. PCに自身のR4WiFiをUSB接続しビルドと書き込みを行う
+4. リセットボタンを押し、OLEDに表示されたURLにアクセス
 
 ## 仕様
 
@@ -31,16 +45,49 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 使用モジュール
 
 * Arduino UNO R4 Wifi
-* ジョイスティックモジュール
-* ボタン×4
+* ジョイスティックモジュール　QYF-860
+* OLED　GM009605
+* ボタン×4 **※1**
 * 10k抵抗×4
 * 104mFセラミックコンデンサ×4
-* OLED
+
+> ※1<br>
+> 本プロジェクトで使用しているボタンはブレッドボード画像内の右から数えて二つだけのため、このプロジェクトを動かすだけであればそれ以外のボタンは接続する必要がない
 
 ### ソフトウェア
 
+#### 使用ライブラリ
+
+* WiFiS3
+* ArduinoJson
+* Adafruit SSD1306
+* SPI（前提ライブラリ）
+* Wire（前提ライブラリ）
+* Adafruit GFX（前提ライブラリ）
+  
+#### 追加ファイル
+
+* arduino_secrets.h **※2**
+* sha1.h, sha1.cpp
+* base64.h, base64.cpp
+* gamepageHTML.h **※3**
+* gamepageJS.h **※3**
+* gamepageCSS.h **※3**
+
+> ※2<br>
+> Wi-FiのSSIDとパスワードを自身の使用するものに書き換える必要がある。<br>
+> また、つなぐWi-Fiの周波数帯は2.4GHzを使用すること。<br>
+> <br>
+> ※3<br>
+> 今回のプロジェクトではクライアントサーバーのユーザーインターフェース及びゲームそのものをHTML、CSS、JavaScriptで記述したかったため、R4WiFiがサーバー上に記述するために用意したヘッダーファイルである。<br>
+> 記述内容はHTML、CSS、JavaScriptを文字列としてdefine変数に格納しメインのソースファイルで読み込めるようにしたもの。
+
+#### websocket通信
+
+本プロジェクトで使用しているR4WiFiでは満足に動かせるwebsocket通信ライブラリが存在しなかったため、ローカル側で独自にキー生成から受信、送信を行い通信を確立させている。<br>
+追加ファイルに含まれているsha1及びbase64はキー生成のための追加ソースファイルである。
+
 ざっくりしたプログラムフローチャート<br>
-OLEDに立てられたアクセス用クライアントサーバーのURLが表示される
 
 ```mermaid
 flowchart TD;
@@ -93,8 +140,13 @@ flowchart LR;
 * 3秒のカウントダウンの後、岩や草が上から流れてくる
 * スコア800点毎にレベルが上がる
 * レベルが上がる毎に岩や草の流れるスピードが速くなっていく
-* ```Aボタン```（R4Wifiの5番PINに接続されたボタン）を押しながらジョイスティックを倒すことで移動速度が一時的に向上する
+* ```Aボタン```（R4WiFiの5番PINに接続されたボタン）を押しながらジョイスティックを倒すことで移動速度が一時的に向上する
 * 草は当たっても問題ないが、岩は当たると車が破壊されゲームオーバーとなる
-* ゲームオーバー後は```Bボタン```（R4Wifiの4番PINに接続されたボタン）を押すことでリトライが可能
+* ゲームオーバー後は```Bボタン```（R4WiFiの4番PINに接続されたボタン）を押すことでリトライが可能
 * リトライするとき現在スコアが記録されているハイスコアより高かった時にハイスコアが更新される。
 * サイトのリロードはArduino側のリセットボタン
+
+## 使用素材クレジット
+
+* 車、岩、草、爆発の画像　[いらすとや](https://www.irasutoya.com/)
+* 各種音源　[PANICPUMPKIN](https://pansound.com/panicpumpkin/index.html)
