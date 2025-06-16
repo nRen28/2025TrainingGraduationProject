@@ -3,7 +3,6 @@
 ## 概要
 
 Arduino UNO R4 Wifiを用いたwebsocket通信とクライアントサーバーの構築及びそれによるデータ通信でプレイ可能なブラウザゲーム<br>
-クライアントサーバーが立つと接続のためのURLがOLEDに表示されるので、それをブラウザに入力しアクセスする<br>
 通信でコントローラーの操作情報を送り、赤い車を操作して岩を躱しつづけた時間でスコアが決定する<br>
 HTMLはGoogle Chromeでのみ動作確認済<br><br>
 実際にR4Wifiの中で使われているソースファイルは全て```gameproject3```フォルダ内に入っており、HTML、CSS、JSの内容を分かりやすくそれぞれのファイルにまとめたものが```data```フォルダに入っている
@@ -12,7 +11,7 @@ HTMLはGoogle Chromeでのみ動作確認済<br><br>
 <br>
 
 ![GitHub](./ReadmeImages/RepositoryQR.png)<br>
-**プロジェクトのGitHubリポジトリのQRコード**
+**プロジェクトのGitHubリポジトリのQRコード**<br>
 https://github.com/fanofJOTARO/2025TrainingGraduationProject
 
 ## 仕様
@@ -39,8 +38,8 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 
 ### ソフトウェア
 
-ざっくりしたプログラムフローチャート
-OLEDに立てられたアクセス用サーバー
+ざっくりしたプログラムフローチャート<br>
+OLEDに立てられたアクセス用クライアントサーバーのURLが表示される
 
 ```mermaid
 flowchart TD;
