@@ -21,29 +21,30 @@ const canvas = document.getElementById('view');
 const ctx = canvas.getContext('2d');
 
 const carImage = new Image();
-carImage.src = 'images/topview_car.png';
+carImage.src = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfInSvdQxRAmhLRUfsGqyXZjNkX_AwS8vyVuFgBhYJRAKlWhYyP79vZHWpGwQQh-Bj2WHCQyG-wgq-kw4JQKnLepcPY20EJo21LKmqjTjAhuhz5RPvKdYEALDINhqcjyC83mgSa_g_sc/s450/topview_car.png';
 
 const grassImage = new Image();
-grassImage.src = 'images/kusa_simple5.png';
+grassImage.src = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgn1kxWkcvp6i9kRv9zUYWkNZJZLDHWY0zpixmuG8XWj8zC1LDWnOWX1DtFJrQI3TK8uqF2f7Puu4t2KOiMyzwjKR3dXbtcPRxNZwvUpvH8_EdQogYJfTdQcmGa8SyzNlvJijyEsIZGdHq0/s200/kusa_simple5.png';
 
 const stoneImage = new Image();
-stoneImage.src = 'images/nature_stone_iwa.png';
+stoneImage.src = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiReAu3VdXl-7xmrgsPeJcfiNeky-yZUG2HQ3fT_gphIODNerTe0oC4cmLA3z_8Hrs6X8Att1k1ZkRh4fif2-m39WRN1uYVKkO2bqJzc2NTOD43UDEIlMX_wO3VCkwF-9mdFiaub24wItS1/s400/nature_stone_iwa.png';
 
 const bombImage = new Image();
-bombImage.src = 'images/bakuhatsu3.png';
+bombImage.src = 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjaJoVbPqEJx7c3mZO5WdnKSxOCHTM-enABNo7kb6M-u4EpNB9tyhMKIxGos9iqV3yKCjNgUCEGN3GR9r2mbgXeMA3h-RjAbNhmbM0Upy8SZfpuxDOuNxTi8TsDQrUcx31OfLouD-Ey-SXp/s150/bakuhatsu3.png';
 
-// const titleBGM = new Audio('audio/bgm/nandainoitteme.wav');
-// const gameBGM = new Audio('audio/bgm/saranarukunann.wav');
+const titleBGM = 'https://pansound.com/panicpumpkin/music/mp3/BGM158-131031-nandainoitteme-mp3.mp3';
+const gameBGM = 'https://pansound.com/panicpumpkin/music/mp3/BGM138-121031-saranarukunan-mp3.mp3';
+const countSE = 'https://pansound.com/panicpumpkin/music/se/error.wav';
+const startSE = 'https://pansound.com/panicpumpkin/music/se/kettei_daiketteifantasy.wav';
+const bombSE = 'https://pansound.com/panicpumpkin/music/se/honoobakuhatsu.wav';
+const gameoverJingle = 'https://pansound.com/panicpumpkin/music/wav/ME039-141031-clear11-wav.wav';
 
-const titleBGM = 'audio/bgm/nandainoitteme.wav';
-const gameBGM = 'audio/bgm/saranarukunann.wav';
-const countSE = 'audio/se/count.wav';
-const startSE = 'audio/se/start.wav';
-const bombSE = 'audio/se/honoobakuhatsu.wav';
-const gameoverJingle = 'audio/se/gameover.wav';
-
-const bgmPlayer = document.createElement('audio');
-const sePlayer = document.createElement('audio');
+const titleBGMPlayer = document.createElement('audio');
+const gameBGMPlayer = document.createElement('audio');
+const countDownSEPlayer = document.createElement('audio');
+const startSEPlayer = document.createElement('audio');
+const bombSEPlayer = document.createElement('audio');
+const gameOverSEPlayer = document.createElement('audio');
 
 var playerHitBox = [0, 0, 50, 50];
 var stoneHitBox = [
@@ -77,14 +78,28 @@ var timer = 0;
 var refreshTime = 240;
 var isStop = false;
 
-// window.onload = function() {
-//     bgmPlayer.src = titleBGM;
-//     bgmPlayer.play();
-// };
-
 window.onload = function () {
-    sePlayer.volume = 0.25;
-    bgmPlayer.volume = 0.25;
+    titleBGMPlayer.pause();
+    gameBGMPlayer.pause();
+    countDownSEPlayer.pause();
+    startSEPlayer.pause();
+    bombSEPlayer.pause();
+    gameOverSEPlayer.pause();
+    titleBGMPlayer.volume = 0.25
+    gameBGMPlayer.volume = 0.25
+    countDownSEPlayer.volume = 0.25
+    startSEPlayer.volume = 0.25
+    bombSEPlayer.volume = 0.25
+    gameOverSEPlayer.volume = 0.25
+    titleBGMPlayer.src = titleBGM;
+    gameBGMPlayer.src = gameBGM;
+    countDownSEPlayer.src = countSE;
+    startSEPlayer.src = startSE;
+    bombSEPlayer.src = bombSE;
+    gameOverSEPlayer.src = gameoverJingle;
+
+    titleBGMPlayer.loop = true;
+    gameBGMPlayer.loop = true;
 
 };
 
@@ -96,10 +111,10 @@ function connectWebSocket() {
 
     ws.onopen = function () {
         statusSpan.textContent = '接続済み';
-        bgmPlayer.pause();
         playingGame = true;
-        sePlayer.src = countSE;
-        sePlayer.play();
+        titleBGMPlayer.pause();
+        countDownSEPlayer.currentTime = 0;
+        countDownSEPlayer.play();
         // addLog('接続成功');
         updateButtons();
     };
@@ -139,9 +154,6 @@ function connectWebSocket() {
 function updateButtons() {
     const connected = ws && ws.readyState === WebSocket.OPEN;
     connectBtn.disabled = connected;
-    // disconnectBtn.disabled = !connected;
-    // sendBtn.disabled = !connected;
-    // messageInput.disabled = !connected;
 }
 
 // WebSocket切断
@@ -154,6 +166,8 @@ function disconnectWebSocket() {
 var sec = 0;
 var score = 0;
 var level = 1;
+var highscore = 0;
+var highlevel = 1;
 var grassPos = [[30, 0], [250, 150], [100, 300], [0, 450], [0, 600]];
 var stonePos = [
     [0, -500],
@@ -163,21 +177,12 @@ var stonePos = [
 ]
 function drawGame() {
     if (playingGame) {
-        
-        // if (timer < refreshTime) timer++;
-        // else {
-        //     timer = 0;
-        //     // refreshTime /= speed;
-        // }
         timer++;
-        // if(timer % 60 == 0) console.log(timer);
         
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'darkgreen';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // if (route1Time < routeMaxTime) route1Time++;
-        // if (route2Time < routeMaxTime) route2Time++;
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -185,39 +190,6 @@ function drawGame() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = 'Wheat';
-
-        if (road1Route == beforeRoute1) {
-            routeTurnTiming1 = Math.floor(Math.random() * 100);
-            if (routeTurnTiming1 > 95) {
-                road1Route = Math.floor(Math.random() * 50) - 25;
-                route1Time = 0;
-            }
-        }
-        if (road2Route == beforeRoute2) {
-            routeTurnTiming2 = Math.floor(Math.random() * 100);
-            if (routeTurnTiming2 > 95) {
-                road2Route = Math.floor(Math.random() * 50) - 25;
-                route2Time = 0;
-            }
-        }
-        for (let i = 59; i >= 0; i--) {
-            if (i > 0) {
-                road1XY[i] = road1XY[i - 1];
-            }
-            else {
-                road1XY[i] = beforeRoute1 + ((road1Route - beforeRoute1) * (route1Time / routeMaxTime));
-            }
-        }
-        for (let i = 59; i >= 0; i--) {
-            if (i > 0) {
-                road2XY[i] = road2XY[i - 1];
-            }
-            else {
-                road2XY[i] = beforeRoute2 + ((road2Route - beforeRoute2) * (route2Time / routeMaxTime));
-            }
-        }
-        if (route1Time >= routeMaxTime) beforeRoute1 = road1Route;
-        if (route2Time >= routeMaxTime) beforeRoute2 = road2Route;
 
         for (let i = 0; i < 60; i++) {
             // ctx.fillRect(road1XY[i] + 225, i * 10, 100, 100);
@@ -236,22 +208,71 @@ function drawGame() {
         const stonesizeY = 362 * mag * 0.5;
         var speed = 1;
 
-        
+        if (startGame && !isStop) {
+            // console.log(road1XY[0]);
+            document.getElementById("score").innerHTML = `Score : ${String(score).padStart(5, '0')}`;
+            document.getElementById("level").innerHTML = `Level : ${level}`;
+            if (xd < 50 && xd > -50) xd = 0;
+            if (bd == 1) speed = 2;
+            else speed = 1;
+            playerVelo = xd * 0.02 * speed;
+            if (playerX < ((-canvas.width / 2) + carsizeX / 2)) playerX = (-canvas.width / 2) + carsizeX / 2;
+            if (playerX > ((canvas.width / 2) - carsizeX / 2)) playerX = (canvas.width / 2) - carsizeX / 2;
+            playerX += playerVelo;
+            
+            if (!isStop) {
+                score++;
+                if (timer % 800 == 0) {
+                    level++;
+                }
+                for (let i = 0; i < 5; i++)
+                {
+                    grassPos[i][1] += 5 + (level-1) * 0.5;
+                    if (grassPos[i][1] > canvas.height) {
+                        grassPos[i][1] = -grasssizeY - (Math.floor(Math.random() * canvas.height));
+                        grassPos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
+                    }
+                }
+                for (let i = 0; i < 4; i++)
+                {
+                    stonePos[i][1] += 5 + (level-1) * 0.5;
+                    if (stonePos[i][1] > canvas.height) {
+                        stonePos[i][1] = -stonesizeY - (Math.floor(Math.random() * 1200));
+                        stonePos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
+                        
+                    }
+                    stoneHitBox[i][0] = stonePos[i][0] + 10;
+                    stoneHitBox[i][1] = stonePos[i][1] + 20;
+                    stoneHitBox[i][2] = stonesizeX - 20;
+                    stoneHitBox[i][3] = stonesizeY - 30;
+                }
+            }
+            
+        }
+        for (let i = 0; i < 5; i++) {
+            ctx.drawImage(grassImage, grassPos[i][0], grassPos[i][1], grasssizeX, grasssizeY);
+        }
+        for (let i = 0; i < 4; i++) {
+            ctx.drawImage(stoneImage, stonePos[i][0], stonePos[i][1], stonesizeX, stonesizeY);
+            ctx.fillStyle = 'red';
+            // 石の当たり判定可視化
+            // ctx.fillRect(stoneHitBox[i][0], stoneHitBox[i][1], stoneHitBox[i][2], stoneHitBox[i][3]);
+        }
+
         if (!startGame && !isStop) {
             if (timer % 60 == 0) {
                 sec++;
                 if (sec < 3) {
-                    sePlayer.src = countSE;
-                    sePlayer.play();
+                    countDownSEPlayer.currentTime = 0;
+                    countDownSEPlayer.play();
                 }
                 else if (sec == 3) {
-                    sePlayer.src = startSE;
-                    sePlayer.play();
+                    startSEPlayer.currentTime = 0;
+                    startSEPlayer.play();
                 }
                 else if (sec == 4) {
-                    bgmPlayer.src = gameBGM;
-                    bgmPlayer.loop
-                    bgmPlayer.play();
+                    gameBGMPlayer.currentTime = 0;
+                    gameBGMPlayer.play();
                 }
             }
             switch(sec) {
@@ -307,64 +328,6 @@ function drawGame() {
             }
 
         }
-        if (startGame && !isStop) {
-            // console.log(road1XY[0]);
-            document.getElementById("score").innerHTML = `Score : ${String(score).padStart(5, '0')}`;
-            document.getElementById("level").innerHTML = `Level : ${level}`;
-            if (xd < 50 && xd > -50) xd = 0;
-            if (bd == 1) speed = 2;
-            else speed = 1;
-            playerVelo = xd * 0.02 * speed;
-            if (playerX < ((-canvas.width / 2) + carsizeX / 2)) playerX = (-canvas.width / 2) + carsizeX / 2;
-            if (playerX > ((canvas.width / 2) - carsizeX / 2)) playerX = (canvas.width / 2) - carsizeX / 2;
-            playerX += playerVelo;
-            
-            if (!isStop) {
-                score++;
-                if (timer % 800 == 0) {
-                    level++;
-                }
-                for (let i = 0; i < 5; i++)
-                {
-                    grassPos[i][1] += 5 + (level-1) * 0.5;
-                    if (grassPos[i][1] > canvas.height) {
-                        grassPos[i][1] = -grasssizeY - (Math.floor(Math.random() * canvas.height));
-                        grassPos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
-                    }
-                }
-                for (let i = 0; i < 4; i++)
-                {
-                    stonePos[i][1] += 5 + (level-1) * 0.5;
-                    if (stonePos[i][1] > canvas.height) {
-                        stonePos[i][1] = -stonesizeY - (Math.floor(Math.random() * 1200));
-                        stonePos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
-                        
-                    }
-                    stoneHitBox[i][0] = stonePos[i][0] + 10;
-                    stoneHitBox[i][1] = stonePos[i][1] + 20;
-                    stoneHitBox[i][2] = stonesizeX - 20;
-                    stoneHitBox[i][3] = stonesizeY - 30;
-                }
-            }
-            
-        }
-        for (let i = 0; i < 5; i++) {
-            ctx.drawImage(grassImage, grassPos[i][0], grassPos[i][1], grasssizeX, grasssizeY);
-        }
-        for (let i = 0; i < 4; i++) {
-            ctx.drawImage(stoneImage, stonePos[i][0], stonePos[i][1], stonesizeX, stonesizeY);
-            ctx.fillStyle = 'red';
-            // 石の当たり判定可視化
-            // ctx.fillRect(stoneHitBox[i][0], stoneHitBox[i][1], stoneHitBox[i][2], stoneHitBox[i][3]);
-        }
-
-        /*
-        [0] = 左
-        [0]+[2] = 右
-        [1] = 上
-        [1]+[3] = 下
-        
-        */
         
         if (!isStop) {
             for (let i = 0; i < 4; i++) {
@@ -383,9 +346,9 @@ function drawGame() {
                     isStop = true;
                     timer = 1;
                     sec = 0;
-                    sePlayer.src = bombSE;
-                    sePlayer.play();
-                    bgmPlayer.pause();
+                    gameBGMPlayer.pause();
+                    bombSEPlayer.currentTime = 0;
+                    bombSEPlayer.play();
                 }
             }
 
@@ -394,9 +357,8 @@ function drawGame() {
             if (timer % 60 == 0) {
                 sec++;
                 if (sec == 2) {
-                    bgmPlayer.src = gameoverJingle;
-                    bgmPlayer.loop = false;
-                    bgmPlayer.play();
+                    gameOverSEPlayer.currentTime = 0;
+                    gameOverSEPlayer.play();
                 }
             }
             // console.log(sec);
@@ -469,11 +431,10 @@ function drawGame() {
 drawGame();
 
 canvas.addEventListener("click", e => {
-    if (bgmPlayer.paused && !playingGame) {
+    if (titleBGMPlayer.paused && !playingGame) {
         if (!playingGame) {
-            bgmPlayer.loop = true;
-            bgmPlayer.src = titleBGM;
-            bgmPlayer.play();
+            titleBGMPlayer.currentTime = 0;
+            titleBGMPlayer.play();
         }
 
     }
@@ -484,11 +445,17 @@ function gameReset() {
     const grasssizeY = 98 * mag * 0.8;
     const stonesizeX = 400 * mag * 0.5;
     const stonesizeY = 362 * mag * 0.5;
+    if (score > highscore) highscore = score;
+    if (level > highlevel) highlevel = level;
+    document.getElementById("highscore").innerHTML = `High score : ${String(highscore).padStart(5, '0')}`;
+    document.getElementById("highlevel").innerHTML = `High level : ${highlevel}`;
     score = 0;
     timer = 0;
     sec = 0;
     playerX = 0;
     level = 1;
+    document.getElementById("score").innerHTML = `Score : ${String(score).padStart(5, '0')}`;
+    document.getElementById("level").innerHTML = `Level : ${level}`;
     for (let i = 0; i < 4; i++) {
         stonePos[i][1] = -stonesizeY - (Math.floor(Math.random() * canvas.height) - 10);
         stonePos[i][0] = Math.floor(Math.random() * (canvas.width + 30)) - 30;
@@ -503,8 +470,7 @@ function gameReset() {
     }
     isStop = false;
     startGame = false;
-    sePlayer.src = countSE;
-    bgmPlayer.pause();
-    bgmPlayer.loop = true;
-    sePlayer.play();
+    gameOverSEPlayer.pause();
+    countDownSEPlayer.currentTime = 0;
+    countDownSEPlayer.play();
 }

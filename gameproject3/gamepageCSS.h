@@ -25,7 +25,7 @@ body {\n\
 \n\
 .score {\n\
     background-color: white;\n\
-    height: 100px;\n\
+    height: 170px;\n\
     padding-left: 10px;\n\
     padding-right: 10px;\n\
     border-top: 5px double;\n\

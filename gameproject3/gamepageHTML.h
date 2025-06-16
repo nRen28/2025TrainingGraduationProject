@@ -17,6 +17,8 @@
             <div class=\"score\">\n\
                 <p id=\"score\" style=\"font-family: 'Arial black';\">Score : 00000</p>\n\
                 <p id=\"level\" style=\"font-family: 'Arial black';\">Level : 1</p>\n\
+                <p id=\"highscore\" style=\"font-family: 'Arial black';\">High score : 00000</p>\n\
+                <p id=\"highlevel\" style=\"font-family: 'Arial black';\">High level : 1</p>\n\
                 <p id=\"pxd\" hidden>xd : 0</p>\n\
                 \n\
                 <div id=\"connectview\" class=\"connectview\">\n\

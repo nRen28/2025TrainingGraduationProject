@@ -3,34 +3,21 @@
 #include "sha1.h"
 #include "base64.h"
 #include <SPI.h>
-// #include <Wire.h>
-// #include <Adafruit_GFX.h>
-// #include <Adafruit_Sensor.h>
-// #include <Adafruit_SSD1306.h>
-// #include <Adafruit_MPU6050.h>
-// #include <MadgwickAHRS.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #include "arduino_secrets.h"
 #include "gamepageHTML.h"
 #include "gamepageJS.h"
 #include "gamepageCSS.h"
 
-// #define SCREEN_WIDTH 128  // OLED display width, in pixels
-// #define SCREEN_HEIGHT 64  // OLED display height, in pixels
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  // OLED display height, in pixels
 
 // // Declaration for SSD1306 display connected using I2C
-// #define OLED_RESET -1  // Reset pin # (or -1 if sharing Arduino reset pin)
-// #define SCREEN_ADDRESS 0x3C
-// Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-// Initialize sensor objects
-// Adafruit_MPU6050 mpu;
-// Madgwick mfilter;
-// Timers
-// unsigned long timer = 0;
-// float timeStep = 0.01;
-// float pitch = 0;
-// float roll = 0;
-// float yaw = 0;
+#define OLED_RESET -1  // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
@@ -51,38 +38,29 @@ int lastButtonState = 0;
 
 void setup() {
   Serial.begin(115200);
+  while (!Serial);
 
   pinMode(ledPin, OUTPUT);
   pinMode(buttonA, INPUT);
   pinMode(buttonB, INPUT);
   pinMode(buttonX, INPUT);
   pinMode(buttonY, INPUT);
-  digitalWrite(ledPin, HIGH);
-  //attachInterrupt(digitalPinToInterrupt(buttonA), pressA, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(buttonB), pressB, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(buttonX), pressX, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(buttonY), pressY, FALLING);
-
-  // mfilter.begin(100);
-
-  // initializeMPU6050();
+  digitalWrite(ledPin, HIGH); 
 
   // initialize the OLED object
-  // while (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-  //   Serial.println(F("SSD1306 allocation failed"));
-  //   for (;;)
-  //     ;
-  // }
+  while (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;)
+      ;
+  }
 
-  // display.clearDisplay();
-  // display.setTextSize(1);       // Set text size
-  // display.setTextColor(WHITE);  // Set text color
+  display.clearDisplay();
+  display.setTextSize(1);       // Set text size
+  display.setTextColor(WHITE);  // Set text color
 
-  // display.setCursor(0, 0);     // Set cursor position
-  // display.print("Initializing...");
-
-  //printOLED("Hello World!", 0, 0);
-  while (!Serial);
+  display.setCursor(0, 28);     // Set cursor position
+  display.print("Initializing...");
+  display.display();
 
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
@@ -111,30 +89,31 @@ void setup() {
 
   server.begin();
   serverWS.begin();
-  Serial.println("Connected!");
-  Serial.print("LocalIP : ");
-  Serial.println(WiFi.localIP());
-  // display.clearDisplay();
-  // display.setTextSize(1);       // Set text size
-  // display.setTextColor(WHITE);  // Set text color
-
-  // display.setCursor(0, 0);     // Set cursor position
-  // display.print("Initialized!");
+  
 }
 
 void loop() {
   WiFiClient client = server.available();
   WiFiClient clientWS = serverWS.available();
-  // Serial.print("LocalIP : ");
-  // Serial.println(WiFi.localIP());
-  // Serial.println(client);
+  display.clearDisplay();
+  display.setTextSize(1);       // Set text size
+  display.setTextColor(WHITE);  // Set text color
+
+  display.setCursor(0, 0);     // Set cursor position
+  display.println("Initialized!");
+  display.println("Local server URL:");
+  display.print("http://");
+  display.print(WiFi.localIP());
+  display.println(":81");
+  display.display();
+
   if (clientWS) {
     Serial.println("new client");           // print a message out the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
     while (clientWS.connected()) {            // loop while the client's connected
       if (clientWS.available()) {             // if there's bytes to read from the client,
         char c = clientWS.read();             // read a byte, then
-        Serial.write(c);                    // print it out to the serial monitor
+        // Serial.write(c);                    // print it out to the serial monitor
         if (c == '\n') {                    // if the byte is a newline character
 
           // if the current line is blank, you got two newline characters in a row.
@@ -166,14 +145,6 @@ void loop() {
           }
         } else if (c != '\r') {  // if you got anything else but a carriage return character,
           currentLine += c;      // add it to the end of the currentLine
-        }
-
-        // Check to see if the client request was "GET /H" or "GET /L":
-        if (currentLine.endsWith("GET /H")) {
-          digitalWrite(LED_BUILTIN, HIGH);               // GET /H turns the LED on
-        }
-        if (currentLine.endsWith("GET /L")) {
-          digitalWrite(LED_BUILTIN, LOW);                // GET /L turns the LED off
         }
       }
       
@@ -218,7 +189,6 @@ void loop() {
     // 受信処理（1フレーム、125バイトまで）
     // =============================
     while (client.connected()) {
-
       if (digitalRead(buttonA) == HIGH) buttonState = 1;
       else if (digitalRead(buttonB) == HIGH) buttonState = 2;
       else if (digitalRead(buttonX) == HIGH) buttonState = 3;
@@ -246,10 +216,6 @@ void loop() {
             break;
         }
       }
-      //refreshOLED();
-
-      // sensors_event_t a, g, temp;
-      // mpu.getEvent(&a, &g, &temp);
 
       const char* reply = createSensorJSON().c_str();
       uint8_t rlen = strlen(reply);
@@ -267,134 +233,14 @@ void loop() {
         frame[2] = rlen >> 8;  // no mask
         memcpy(&frame[4], reply, rlen);
         client.write(frame, rlen + 4);
-      }
-      
-      // Serial.println(reply);
-      // Serial.println(rlen);
-
-      // delay((timeStep * 1000) - (millis() - timer));
+      }      
       delay(1);
-      /*
-      while (!client.available()) delay(10);
-
-      uint8_t header[2];
-      client.read(header, 2);
-      bool fin = header[0] & 0x80;
-      uint8_t opcode = header[0] & 0x0F;
-      bool mask = header[1] & 0x80;
-      uint8_t len = header[1] & 0x7F;
-
-      if (!mask || len > 125 || opcode != 0x1) {
-        client.stop();  // 不正なフレーム
-        break;
-      }
-
-      // マスクキーとデータの読み取り
-      uint8_t maskKey[4];
-      client.read(maskKey, 4);
-      uint8_t payload[126] = {0};
-      client.read(payload, len);
-      for (uint8_t i = 0; i < len; i++) {
-        payload[i] ^= maskKey[i % 4];
-      }
-      payload[len] = 0;
-
-      Serial.print("Received: ");
-      Serial.println((char*)payload);
-
-      // =============================
-      // 返信処理（"Hello from Arduino"）
-      // =============================
-      const char* reply = "Hello from Arduino";
-      uint8_t rlen = strlen(reply);
-      uint8_t frame[128] = {0};
-      frame[0] = 0x81;  // FIN + text
-      frame[1] = rlen;  // no mask
-      memcpy(&frame[2], reply, rlen);
-      client.write(frame, rlen + 2);
-
-      delay(100);  // 応答の安定化のため
-      */
-
     }
-    
-
     client.stop();  // フレーム処理は別途
     Serial.println("Client disconnected.");
   }
+
 }
-
-// void refreshOLED() {
-//   display.clearDisplay();
-//   display.setTextSize(1);       // Set text size
-//   display.setTextColor(WHITE);  // Set text color
-
-//   display.setCursor(0, 0);     // Set cursor position
-//   switch (lastButtonState) {
-//     case 1:
-//       display.println("pressed: A");
-//       break;
-//     case 2:
-//       display.println("pressed: B");
-//       break;
-//     case 3:
-//       display.println("pressed: X");
-//       break;
-//     case 4:
-//       display.println("pressed: Y");
-//       break;
-//     default:
-//       display.println("pressed: NONE");
-//       break;
-//   }
-
-//   display.setCursor(0, 7);
-//   /* Get new sensor events with the readings */
-//   sensors_event_t a, g, temp;
-//   mpu.getEvent(&a, &g, &temp);
-
-//   /* Print out the values */
-//   display.print("Acc X: ");
-//   display.print(a.acceleration.x);
-//   display.print(", Y: ");
-//   display.print(a.acceleration.y);
-//   display.print(", Z: ");
-//   display.print(a.acceleration.z);
-//   display.println(" m/s^2");
-
-//   display.print("Ro  X: ");
-//   display.print(g.gyro.x);
-//   display.print(", Y: ");
-//   display.print(g.gyro.y);
-//   display.print(", Z: ");
-//   display.print(g.gyro.z);
-//   display.println(" rad/s");
-
-//   display.print("Temp: ");
-//   display.print(temp.temperature);
-//   display.println(" degC");
-//   display.display();
-// }
-
-// void initializeMPU6050() {
-//   // Check if the MPU6050 sensor is detected
-//   while (!mpu.begin()) {
-//     Serial.println("Failed to find MPU6050 chip");
-//   }
-//   Serial.println("MPU6050 Found!");
-
-//   // set accelerometer range to +-8G
-//   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-
-//   // set gyro range to +- 500 deg/s
-//   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-
-//   // set filter bandwidth to 21 Hz
-//   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
-
-//   Serial.println("");
-//   delay(100);
-// }
 
 void pressA()  {
   Serial.println("pressed: A");
@@ -423,18 +269,10 @@ String createSensorJSON() {
   // JSONドキュメントを作成（容量を指定）
   StaticJsonDocument<256> doc;
 
-  // pitch = pitch + g.gyro.y * timeStep;
-  // roll = roll + g.gyro.x * timeStep;
-  // yaw = yaw + g.gyro.z * timeStep;
-  // mfilter.updateIMU(g.gyro.x / 131.0, g.gyro.y / 131.0, g.gyro.z / 131.0, a.acceleration.x / 16384.0, a.acceleration.y / 16384.0, a.acceleration.z / 16384.0);
-  
   doc["button"] = lastButtonState;
   doc["X"] = map(analogRead(xPin), 0, 1023, -150, 150);
   doc["Y"] = map(analogRead(yPin), 0, 1023, -150, 150);
 
-  // Serial.println(analogRead(xPin));
-  // Serial.println(analogRead(yPin));
-  
   // JSON文字列に変換
   String jsonString;
   serializeJson(doc, jsonString);
