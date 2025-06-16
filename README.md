@@ -49,7 +49,7 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 * OLED　GM009605
 * ボタン×4 **※1**
 * 10k抵抗×4
-* 104mFセラミックコンデンサ×4
+* 104μFセラミックコンデンサ×4
 
 > ※1<br>
 > 本プロジェクトで使用しているボタンはブレッドボード画像内の右から数えて二つだけのため、このプロジェクトを動かすだけであればそれ以外のボタンは接続する必要がない
@@ -58,36 +58,40 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 
 #### 使用ライブラリ
 
-* WiFiS3
-* ArduinoJson
-* Adafruit SSD1306
-* SPI（前提ライブラリ）
-* Wire（前提ライブラリ）
-* Adafruit GFX（前提ライブラリ）
+* Wi-Fi接続
+  * WiFiS3
+* JSONファイル処理
+  * ArduinoJson
+* OLED
+  * Adafruit SSD1306
+  * SPI
+  * Wire
+  * Adafruit GFX
   
-#### 追加ファイル
+#### 以下追加ファイル
 
-* arduino_secrets.h **※2**
-* sha1.h, sha1.cpp
-* base64.h, base64.cpp
-* gamepageHTML.h **※3**
-* gamepageJS.h **※3**
-* gamepageCSS.h **※3**
+* Wi-Fi接続
+  * arduino_secrets.h
+* websocketサーバー
+  * sha1.h, sha1.cpp
+  * base64.h, base64.cpp
+* ゲーム記述
+  * gamepageHTML.h
+  * gamepageJS.h
+  * gamepageCSS.h
 
-> ※2<br>
-> Wi-FiのSSIDとパスワードを自身の使用するものに書き換える必要がある。<br>
-> また、つなぐWi-Fiの周波数帯は2.4GHzを使用すること。<br>
-> <br>
-> ※3<br>
-> 今回のプロジェクトではクライアントサーバーのユーザーインターフェース及びゲームそのものをHTML、CSS、JavaScriptで記述したかったため、R4WiFiがサーバー上に記述するために用意したヘッダーファイルである。<br>
-> 記述内容はHTML、CSS、JavaScriptを文字列としてdefine変数に格納しメインのソースファイルで読み込めるようにしたもの。
-
-#### websocket通信
-
+<br>**Wi-Fi接続**<br>
+Wi-FiのSSIDとパスワードを自身の使用するものに書き換える必要がある。<br>
+また、つなぐWi-Fiの周波数帯は2.4GHzを使用すること。<br>
+<br>
+**websocketキー生成**<br>
 本プロジェクトで使用しているR4WiFiでは満足に動かせるwebsocket通信ライブラリが存在しなかったため、ローカル側で独自にキー生成から受信、送信を行い通信を確立させている。<br>
-追加ファイルに含まれているsha1及びbase64はキー生成のための追加ソースファイルである。
+<br>
+**ゲーム記述**<br>
+今回のプロジェクトではクライアントサーバーのユーザーインターフェース及びゲームそのものをHTML、CSS、JavaScriptで記述したかったため、R4WiFiがサーバー上に記述するために用意したヘッダーファイルである。<br>
+記述内容はHTML、CSS、JavaScriptを文字列としてdefine変数に格納しメインのソースファイルで読み込めるようにしたもの。
 
-ざっくりしたプログラムフローチャート<br>
+**ざっくりしたプログラムフローチャート**<br>
 
 ```mermaid
 flowchart TD;
