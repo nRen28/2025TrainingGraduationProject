@@ -1,6 +1,6 @@
 # 研修卒業制作2025
 
-<video controls src="./ReadmeVideos/283533_small.mp4" title="Title" controls="true"></video>
+https://github.com/user-attachments/assets/1e7a2bde-b877-4246-8610-92bfb19e9361
 
 ## 概要
 
