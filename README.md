@@ -12,7 +12,6 @@ Google Chromeでのみ動作確認済<br><br>
 実際にR4WiFiの中で使われているソースファイルは全て```gameproject3```フォルダ内に入っており、HTML、CSS、JSの内容を分かりやすくそれぞれのファイルにまとめたものが```data```フォルダに入っている
 
 <br>
-<br>
 
 ![GitHub](./ReadmeImages/RepositoryQR.png)<br>
 **プロジェクトのGitHubリポジトリのQRコード**<br>
@@ -48,37 +47,41 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 
 使用モジュール
 
-* Arduino UNO R4 Wifi
-* ジョイスティックモジュール　QYF-860
-* OLED　GM009605
-* ボタン×4 **※1**
-* 10kΩ抵抗×4
-* 104μFセラミックコンデンサ×4
+|部品|個数|用途|接続PIN|
+|---|---|---|---|
+|Arduino UNO R4 Wifi|1個|マイコン|USB-TypeC|
+|ジョイスティック　QYF-860|1個|ゲーム操作|VCC : 5V<br>GND : GND<br>X : A0<br>Y : A1|
+|OLED　GM009605|1個|接続URL表示|VCC : 5V<br>GND : GND<br>SDA : SDA<br>SCK : SCL|
+|ボタン **※1**|4個|ゲーム操作用<br>ABXYボタン|A : D5<br>B : D4<br>X : D2<br>Y : D3|
+|10kΩ抵抗|4個|ボタンの抵抗|各種ボタン|
+|104μFセラミックコンデンサ|4個|ボタンのチャタリング防止|各種ボタン|
 
 > ※1<br>
-> 本プロジェクトで使用しているボタンはブレッドボード画像内の右から数えて二つだけのため、このプロジェクトを動かすだけであればそれ以外のボタンは接続する必要がない
+> 本プロジェクトで使用しているボタンはAボタン、Bボタンの二つだけのため、このプロジェクトを動かすだけであればそれ以外のボタンは接続する必要がない
 
 ### ソフトウェア
 
 #### 使用ライブラリ
 
 * Wi-Fi接続
-  * WiFiS3
+  * [WiFiS3](https://docs.sunfounder.com/projects/elite-explorer-kit/ja/latest/iot_projects/01_iot_webserver.html)
 * JSONファイル処理
-  * ArduinoJson
+  * [ArduinoJson](https://arduinojson.org/?utm_source=meta&utm_medium=library.properties)
 * OLED
-  * Adafruit SSD1306
-  * SPI
-  * Wire
-  * Adafruit GFX
+  * [Adafruit SSD1306](https://github.com/adafruit/Adafruit_SSD1306)
+  * [Adafruit GFX](https://github.com/adafruit/Adafruit-GFX-Library)
+  * [SPI](https://github.com/arduino/ArduinoCore-avr/tree/master/libraries/SPI)
+  * [Wire](https://github.com/arduino/ArduinoCore-avr/tree/master/libraries/Wire)
   
 #### 以下追加ファイル
 
 * Wi-Fi接続
   * arduino_secrets.h
 * websocketサーバー
-  * sha1.h, sha1.cpp
-  * base64.h, base64.cpp
+  * sha1.h
+  * sha1.cpp
+  * base64.h
+  * base64.cpp
 * ゲーム記述
   * gamepageHTML.h
   * gamepageJS.h
@@ -133,7 +136,7 @@ flowchart TD;
 ```mermaid
 flowchart LR;
     サイト起動 --> タイトル画面
-    タイトル画面 --> ゲーム開始
+    タイトル画面 --> |websocket接続|ゲーム開始
     ゲーム開始 -->|岩にぶつかる|ゲームオーバー
     ゲームオーバー-->|リトライ|ゲーム開始
 ```
