@@ -1,5 +1,7 @@
 # 研修卒業制作2025
 
+<video controls src="./ReadmeVideos/283533_small.mp4" title="Title"></video>
+
 ## 概要
 
 Arduino UNO R4 Wifiを用いたwebsocket通信とクライアントサーバーの構築及びそれによるデータ通信でプレイ可能なブラウザゲーム<br>
