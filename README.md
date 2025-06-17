@@ -1,6 +1,6 @@
 # 研修卒業制作2025
 
-<video controls src="./ReadmeVideos/283533_small.mp4" title="Title" controls="true"></video>
+https://github.com/fanofJOTARO/2025TrainingGraduationProject/raw/refs/heads/main/ReadmeVideos/283533_small.mp4
 
 ## 概要
 
