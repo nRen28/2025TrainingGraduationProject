@@ -26,9 +26,9 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 ### セットアップ方法
 
 1. フォルダ内の```gameproject3.ino```をArduino IDEで開く
-2. ```arduino_secrets.h```の```SECRET_SSID```と```SECRET_PASS```を自が使用しているWi-Fiの2.5GHzのものに書き換える
+2. ```arduino_secrets.h```の```SECRET_SSID```と```SECRET_PASS```を自分が使用しているWi-Fiの2.4GHz帯のものに書き換える
 3. PCに自身のR4WiFiをUSB接続しビルドと書き込みを行う
-4. リセットボタンを押し、OLEDに表示されたURLにアクセス
+4. リセットボタンを押し、OLEDに表示されたURLにアクセス<br>例：```http://192.168.XXX.XXX:81```
 
 ## 仕様
 
@@ -50,7 +50,7 @@ https://github.com/fanofJOTARO/2025TrainingGraduationProject
 * ジョイスティックモジュール　QYF-860
 * OLED　GM009605
 * ボタン×4 **※1**
-* 10k抵抗×4
+* 10kΩ抵抗×4
 * 104μFセラミックコンデンサ×4
 
 > ※1<br>
@@ -87,7 +87,7 @@ Wi-FiのSSIDとパスワードを自身の使用するものに書き換える�
 また、つなぐWi-Fiの周波数帯は2.4GHzを使用すること。<br>
 <br>
 **websocketキー生成**<br>
-本プロジェクトで使用しているR4WiFiでは満足に動かせるwebsocket通信ライブラリが存在しなかったため、ローカル側で独自にキー生成から受信、送信を行い通信を確立させている。<br>
+本プロジェクトで使用しているR4WiFiでは満足に動かせるwebsocket通信ライブラリが存在しなかったため、ローカル側で独自にキー生成からサーバー設立、受信、送信を行い通信を確立させている。<br>
 <br>
 **ゲーム記述**<br>
 今回のプロジェクトではクライアントサーバーのユーザーインターフェース及びゲームそのものをHTML、CSS、JavaScriptで記述したかったため、R4WiFiがサーバー上に記述するために用意したヘッダーファイルである。<br>

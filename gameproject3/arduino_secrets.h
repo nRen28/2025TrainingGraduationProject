@@ -1,2 +1,2 @@
-#define SECRET_SSID "aterm-721da9-g"
-#define SECRET_PASS "shanfa726//5399"
+#define SECRET_SSID "Enter_your_Wi-Fi_SSID"
+#define SECRET_PASS "Enter_your_Wi-Fi_Password"
