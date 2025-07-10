@@ -200,7 +200,7 @@ void loop() {
       if (buttonState != lastButtonState) {
         lastButtonState = buttonState;
         switch (lastButtonState) {
-          case 1:
+          case 1://マジックナンバーなのでenumにした方がいいと思います
             pressA();
             break;
           case 2:
