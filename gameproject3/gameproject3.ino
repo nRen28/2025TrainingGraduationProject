@@ -186,7 +186,7 @@ void loop() {
     Serial.println("Handshake complete.");
 
     // =============================
-    // 受信処理（1フレーム、125バイトまで）
+    // 受信処理（1フレーム、125バイトまで）//受信処理ではなく送信処理では？
     // =============================
     while (client.connected()) {
       if (digitalRead(buttonA) == HIGH) buttonState = 1;
