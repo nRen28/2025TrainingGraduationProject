@@ -1,5 +1,5 @@
 let ws = null;
-const serverUrl = 'ws://192.168.10.110:80';
+const serverUrl = 'ws://192.168.10.110:80';//テスト
 
 const connectBtn = document.getElementById('connectBtn');
 const statusSpan = document.getElementById('status');
